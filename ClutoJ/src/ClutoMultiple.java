@@ -25,41 +25,42 @@ class ClutoRun {
 	static List<ClutoCmd> clutoResults = new ArrayList<ClutoCmd>();
 
 	public ClutoRun() {
-		datasets.add("new3");
+
 		datasets.add("sports");
+		// datasets.add("new3");
 
 		clusteringMethods.add("rb");
-		clusteringMethods.add("direct");
-		clusteringMethods.add("agglo");
-		clusteringMethods.add("graph");
+		// clusteringMethods.add("direct");
+		// clusteringMethods.add("agglo");
+		// clusteringMethods.add("graph");
 
 		similarityMeasures.add("cos");
-		similarityMeasures.add("corr");
+		// similarityMeasures.add("corr");
 
 		criterionFunctions.add("i1");
-		criterionFunctions.add("i2");
-		criterionFunctions.add("e1");
-		criterionFunctions.add("g1");
-		criterionFunctions.add("g1p");
-		criterionFunctions.add("h1");
-		criterionFunctions.add("h2");
-		criterionFunctions.add("slink");
-		criterionFunctions.add("wslink");
-		criterionFunctions.add("clink");
-		criterionFunctions.add("wclink");
-		criterionFunctions.add("upgma");
+		// criterionFunctions.add("i2");
+		// criterionFunctions.add("e1");
+		// criterionFunctions.add("g1");
+		// criterionFunctions.add("g1p");
+		// criterionFunctions.add("h1");
+		// criterionFunctions.add("h2");
+		// criterionFunctions.add("slink");
+		// criterionFunctions.add("wslink");
+		// criterionFunctions.add("clink");
+		// criterionFunctions.add("wclink");
+		// criterionFunctions.add("upgma");
 	}
 
 	public void clutoExecute() {
 		String cmd = "vcluster sports.mat 10";
-		ExecutorService clutoService = Executors.newFixedThreadPool(20);
-		int step = 100;
-
+		ExecutorService clutoService = Executors.newFixedThreadPool(200);
+		int step = 5;
+		int test = 0;
 		for (String d : datasets) {
 			for (String cm : clusteringMethods) {
 				for (String sm : similarityMeasures) {
 					for (String cf : criterionFunctions) {
-						for (int cls = 2; cls < 100;) {
+						for (int cls = 2; cls < 10;) {
 							cmd = "vcluster -crfun="
 									+ cf
 									+ " -clmethod="
@@ -72,8 +73,8 @@ class ClutoRun {
 									+ sm + " " + d + ".mat " + cls;
 							Runnable runCmd = new ClutoConcurrent(cmd);
 							clutoService.execute(runCmd);
-							System.out.println(cmd);
 							cls = cls + step;
+							System.out.println(test++);
 						}
 					}
 				}
@@ -81,9 +82,7 @@ class ClutoRun {
 		}
 
 		while (!clutoService.isTerminated()) {
-
 		}
-		System.out.println("Done!");
 	}
 
 	public static void runClutoCommand(String cmd) throws IOException {
@@ -93,7 +92,7 @@ class ClutoRun {
 		while (sc.hasNext()) {
 			line = sc.nextLine();
 			if (line.contains("Entropy: ") && line.contains("Purity: ")) {
-				clutoResults.add(new ClutoCmd(cmd));
+				clutoResults.add(new ClutoCmd(cmd, line.replaceAll(",", "")));
 			}
 		}
 	}
@@ -141,16 +140,15 @@ class ClutoCmd {
 	double entropy = 0.0;
 	double purity = 0.0;
 
-	public ClutoCmd(String command) {
+	public ClutoCmd(String command, String resLine) {
 		this.cmd = command;
-		String[] line = command.split(" ");
+		String[] line = resLine.split(" ");
 		for (int index = 0; index < line.length; index++) {
 			if (line[index].contains("Entropy:"))
 				this.entropy = Double.parseDouble(line[index + 1]);
 			if (line[index].contains("Purity:"))
 				this.purity = Double.parseDouble(line[index + 1]);
 		}
-		System.out.println(command);
 	}
 }
 
