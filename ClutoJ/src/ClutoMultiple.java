@@ -51,29 +51,29 @@ class ClutoRun {
 		ExecutorService clutoService = Executors.newFixedThreadPool(20);
 		int step = 100;
 
-		for (int d = 0; d < datasets.size(); d++) {
-			for (int cm = 0; cm < clusteringMethods.size(); cm++) {
-				for (int sm = 0; sm < similarityMeasures.size(); sm++) {
-					for (int cf = 0; cf < criterionFunctions.size(); cf++) {
+		for (String d : datasets) {
+			for (String cm : clusteringMethods) {
+				for (String sm : similarityMeasures) {
+					for (String cf : criterionFunctions) {
 						for (int cls = 2; cls < 100;) {
-							cmd = "vcluster -clmethod="
-									+ clusteringMethods.get(cm)
+							cmd = "vcluster -crfun="
+									+ cf
+									+ " -clmethod="
+									+ cm
 									+ " -rclassfile="
-									+ datasets.get(d)
-									+ ".rclass -clabelfile="
-									+ datasets.get(d)
+									+ d
+									+ ".mat.rclass -clabelfile="
+									+ d
 									+ ".mat.clabel -nfeatures=10 -showsummaries=cliques -showfeatures -showtree -labeltree -sim="
-									+ similarityMeasures.get(sm) + " "
-									+ datasets.get(d) + ".mat " + cls;
+									+ sm + " " + d + ".mat " + cls;
 							Runnable runCmd = new ClutoConcurrent(cmd);
 							clutoService.execute(runCmd);
-							// System.out.print(".");
+							System.out.println(cmd);
 							cls = cls + step;
 						}
 					}
 				}
 			}
-			System.out.println("\n");
 		}
 
 		while (!clutoService.isTerminated()) {
