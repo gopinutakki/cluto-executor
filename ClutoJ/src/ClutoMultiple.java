@@ -13,6 +13,7 @@ public class ClutoMultiple {
 		cluto.clutoExecute();
 		cluto.sortEntropyPurity();
 		cluto.printTop();
+		System.out.println("DONE!");
 	}
 }
 
@@ -54,13 +55,13 @@ class ClutoRun {
 	public void clutoExecute() {
 		String cmd = "vcluster sports.mat 10";
 		ExecutorService clutoService = Executors.newFixedThreadPool(200);
-		int step = 1;
+		int step = 10;
 		int test = 0;
 		for (String d : datasets) {
 			for (String cm : clusteringMethods) {
 				for (String sm : similarityMeasures) {
 					for (String cf : criterionFunctions) {
-						for (int cls = 2; cls < 10;) {
+						for (int cls = 2; cls < 50;) {
 							cmd = "vcluster -crfun="
 									+ cf
 									+ " -clmethod="
@@ -92,7 +93,7 @@ class ClutoRun {
 		while (sc.hasNext()) {
 			line = sc.nextLine();
 			if (line.contains("Entropy: ") && line.contains("Purity: ")) {
-				clutoResults.add(new ClutoCmd(cmd, line.replaceAll(",", " ").trim()));
+				clutoResults.add(new ClutoCmd(cmd, line.replaceAll(",", " ")));
 			}
 		}
 	}
@@ -137,10 +138,11 @@ class ClutoRun {
 
 class ClutoCmd {
 	String cmd = "";
-	double entropy = 0.0;
-	double purity = 0.0;
+	double entropy = -1.0;
+	double purity = -1.0;
 
 	public ClutoCmd(String command, String resLine) {
+		System.out.println(resLine);
 		this.cmd = command;
 		String[] line = resLine.split(" ");
 		for (int index = 0; index < line.length; index++) {
