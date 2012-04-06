@@ -48,24 +48,34 @@ class ClutoRun {
 
 	public void clutoExecute() {
 		String cmd = "vcluster sports.mat 10";
-		ExecutorService clutoService = Executors.newFixedThreadPool(1);
-		for (int d = 0; d < datasets.size(); d++)
-			for (int cm = 0; cm < clusteringMethods.size(); cm++)
-				for (int sm = 0; sm < similarityMeasures.size(); sm++)
+		ExecutorService clutoService = Executors.newFixedThreadPool(20);
+		int step = 100;
+
+		for (int d = 0; d < datasets.size(); d++) {
+			for (int cm = 0; cm < clusteringMethods.size(); cm++) {
+				for (int sm = 0; sm < similarityMeasures.size(); sm++) {
 					for (int cf = 0; cf < criterionFunctions.size(); cf++) {
-						cmd = "vcluster -clmethod="
-								+ clusteringMethods.get(cm)
-								+ " -rclassfile="
-								+ datasets.get(d)
-								+ ".rclass -clabelfile="
-								+ datasets.get(d)
-								+ ".mat.clabel -nfeatures=8 -showsummaries=cliques -showfeatures -showtree -labeltree -sim="
-								+ similarityMeasures.get(sm) + " "
-								+ datasets.get(d) + ".mat 10";
-						Runnable runCmd = new ClutoConcurrent(cmd);
-						clutoService.execute(runCmd);
-						// System.out.println(cmd);
+						for (int cls = 2; cls < 100; ) {
+							cmd = "vcluster -clmethod="
+									+ clusteringMethods.get(cm)
+									+ " -rclassfile="
+									+ datasets.get(d)
+									+ ".rclass -clabelfile="
+									+ datasets.get(d)
+									+ ".mat.clabel -nfeatures=10 -showsummaries=cliques -showfeatures -showtree -labeltree -sim="
+									+ similarityMeasures.get(sm) + " "
+									+ datasets.get(d) + ".mat "
+									+ cls;
+							Runnable runCmd = new ClutoConcurrent(cmd);
+							clutoService.execute(runCmd);
+							//System.out.print(".");
+							cls = cls + step;
+						}
 					}
+				}
+			}
+			System.out.println("\n");
+		}
 
 		while (!clutoService.isTerminated()) {
 
@@ -93,7 +103,6 @@ class ClutoCmd {
 
 	public ClutoCmd(String command) {
 		this.cmd = command;
-
 		String[] line = command.split(" ");
 		for (int index = 0; index < line.length; index++) {
 			if (line[index].contains("Entropy:"))
@@ -101,6 +110,7 @@ class ClutoCmd {
 			if (line[index].contains("Purity:"))
 				this.purity = Double.parseDouble(line[index + 1]);
 		}
+		System.out.println(command);
 	}
 }
 
