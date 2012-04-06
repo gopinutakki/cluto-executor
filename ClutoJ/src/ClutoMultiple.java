@@ -54,7 +54,7 @@ class ClutoRun {
 	public void clutoExecute() {
 		String cmd = "vcluster sports.mat 10";
 		ExecutorService clutoService = Executors.newFixedThreadPool(200);
-		int step = 5;
+		int step = 1;
 		int test = 0;
 		for (String d : datasets) {
 			for (String cm : clusteringMethods) {
@@ -92,7 +92,7 @@ class ClutoRun {
 		while (sc.hasNext()) {
 			line = sc.nextLine();
 			if (line.contains("Entropy: ") && line.contains("Purity: ")) {
-				clutoResults.add(new ClutoCmd(cmd, line.replaceAll(",", "")));
+				clutoResults.add(new ClutoCmd(cmd, line.replaceAll(",", " ").trim()));
 			}
 		}
 	}
