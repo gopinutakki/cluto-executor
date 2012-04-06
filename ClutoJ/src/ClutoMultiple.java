@@ -82,6 +82,7 @@ class ClutoRun {
 			}
 		}
 
+		clutoService.shutdown();
 		while (!clutoService.isTerminated()) {
 		}
 	}
