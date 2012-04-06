@@ -55,7 +55,7 @@ class ClutoRun {
 			for (int cm = 0; cm < clusteringMethods.size(); cm++) {
 				for (int sm = 0; sm < similarityMeasures.size(); sm++) {
 					for (int cf = 0; cf < criterionFunctions.size(); cf++) {
-						for (int cls = 2; cls < 100; ) {
+						for (int cls = 2; cls < 100;) {
 							cmd = "vcluster -clmethod="
 									+ clusteringMethods.get(cm)
 									+ " -rclassfile="
@@ -64,11 +64,10 @@ class ClutoRun {
 									+ datasets.get(d)
 									+ ".mat.clabel -nfeatures=10 -showsummaries=cliques -showfeatures -showtree -labeltree -sim="
 									+ similarityMeasures.get(sm) + " "
-									+ datasets.get(d) + ".mat "
-									+ cls;
+									+ datasets.get(d) + ".mat " + cls;
 							Runnable runCmd = new ClutoConcurrent(cmd);
 							clutoService.execute(runCmd);
-							//System.out.print(".");
+							// System.out.print(".");
 							cls = cls + step;
 						}
 					}
