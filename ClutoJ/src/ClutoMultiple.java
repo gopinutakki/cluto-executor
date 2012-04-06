@@ -1,5 +1,7 @@
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
@@ -9,6 +11,8 @@ public class ClutoMultiple {
 	public static void main(String args[]) throws IOException {
 		ClutoRun cluto = new ClutoRun();
 		cluto.clutoExecute();
+		cluto.sortEntropyPurity();
+		cluto.printTop();
 	}
 }
 
@@ -91,6 +95,43 @@ class ClutoRun {
 			if (line.contains("Entropy: ") && line.contains("Purity: ")) {
 				clutoResults.add(new ClutoCmd(cmd));
 			}
+		}
+	}
+
+	void sortEntropyPurity() {
+		Collections.sort(clutoResults, new Comparator() {
+			@Override
+			public int compare(Object o1, Object o2) {
+				ClutoCmd c1 = (ClutoCmd) o1;
+				ClutoCmd c2 = (ClutoCmd) o2;
+
+				if (c1.entropy < c2.entropy)
+					return 1;
+				else if (c1.entropy > c2.entropy)
+					return -1;
+				return 0;
+			}
+		});
+
+		Collections.sort(clutoResults, new Comparator() {
+			@Override
+			public int compare(Object o1, Object o2) {
+				ClutoCmd c1 = (ClutoCmd) o1;
+				ClutoCmd c2 = (ClutoCmd) o2;
+
+				if (c1.purity > c2.purity)
+					return 1;
+				else if (c1.purity < c2.purity)
+					return -1;
+				return 0;
+			}
+		});
+	}
+
+	void printTop() {
+		for (ClutoCmd ccmd : clutoResults) {
+			System.out.println(ccmd.cmd + "#" + ccmd.entropy + "#"
+					+ ccmd.purity);
 		}
 	}
 }
